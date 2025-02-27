@@ -2,22 +2,27 @@ from fastapi import FastAPI
 from azure.monitor.opentelemetry import configure_azure_monitor
 import logging
 import os
-app = FastAPI()
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Configure Azure Monitor
 conn_string = os.getenv("appinsightsKey")
 
 configure_azure_monitor(connection_string=conn_string)
-logger = logging.getLogger(__name__)
-games_db = [{
-    "id": 1,
-    "name": "Call of duty:warzone",
-    "category":"FPS"
-    },
-    {
-    "id":2,
-    "name":"Pubg",
-    "category":"FPS"}]
+
+app = FastAPI()
+
+games_db = [
+    {"id": 1, "name": "Call of duty:warzone", "category": "FPS"},
+    {"id": 2, "name": "Pubg", "category": "FPS"}
+]
+
 @app.get("/")
 async def read_root():
     logger.info("received root request")
@@ -25,11 +30,12 @@ async def read_root():
 
 @app.get("/games")
 async def read_games():
-    logger.info("received games get request")   
+    print(conn_string)
+    logger.info("received games get request")
     return games_db
 
 @app.post("/games")
 async def create_game(game: dict):
-    logger.info("received games post request with id as {game.id}")  
+    logger.info(f"received games post request with id as {game['id']}")  # Fix: Use f-string
     games_db.append(game)
     return game
