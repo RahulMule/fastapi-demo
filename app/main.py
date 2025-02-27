@@ -10,9 +10,10 @@ load_dotenv()
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
+logging.getLogger("azure").setLevel(logging.WARNING)
 # Configure Azure Monitor
 conn_string = os.getenv("appinsightsKey")
+
 
 configure_azure_monitor(connection_string=conn_string)
 
